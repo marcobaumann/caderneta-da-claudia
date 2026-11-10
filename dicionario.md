@@ -62,7 +62,7 @@ Despesa ou receita que repete todo mês. O sistema **não** gera o lançamento s
 | data_fim | DATE NULL | Último mês válido (nulo = sem fim) | 2025-04-30 |
 
 ## lancamentos
-
+anfajnbfo
 Cada gasto ou entrada de dinheiro.
 
 | Coluna | Tipo | Significado | Exemplo |
