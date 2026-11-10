@@ -1,0 +1,7 @@
+[
+  { "id": 1, "nome": "Alimentação", "descricao": "Mercado, restaurantes, delivery e padaria." },
+  { "id": 2, "nome": "Moradia", "descricao": "Aluguel, condomínio, luz, água e internet." },
+  { "id": 3, "nome": "Transporte", "descricao": "Combustível, transporte público, aplicativos e manutenção do veículo." },
+  { "id": 4, "nome": "Renda", "descricao": "Salário, freelas e outras fontes de receita." },
+  { "id": 5, "nome": "Lazer", "descricao": "Cinema, viagens, assinaturas e hobbies." }
+]
