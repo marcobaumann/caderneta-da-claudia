@@ -1,22 +1,15 @@
-import LancamentoCard from "@/components/LancamentoCard";
-import { lancamentos } from "@/lib/lancamentos";
+import LancamentosLista from "@/components/LancamentosLista";
+import { listarLancamentos } from "@/lib/lancamentos";
 
-export default function LancamentosPage() {
+// Server Component async: busca os dados no servidor.
+// Só a lista com filtros (LancamentosLista) é Client Component.
+export default async function LancamentosPage() {
+  const lancamentos = await listarLancamentos();
+
   return (
     <>
       <h1>Lançamentos</h1>
-      <ul className="lista">
-        {lancamentos.map((l) => (
-          <LancamentoCard
-            key={l.id}
-            id={l.id}
-            descricao={l.descricao}
-            valor={l.valor}
-            tipo={l.tipo}
-            data={l.data}
-          />
-        ))}
-      </ul>
+      <LancamentosLista lancamentos={lancamentos} />
     </>
   );
 }
