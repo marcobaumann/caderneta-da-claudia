@@ -1,31 +1,47 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { categorias } from "@/lib/categorias";
-import { contarLancamentosPorCategoria } from "@/lib/lancamentos";
+import { listarCategorias } from "@/lib/categorias";
 
-export default function CategoriasPage() {
+export const metadata: Metadata = { title: "Categorias" };
+
+export default async function CategoriasPage() {
+  const categorias = await listarCategorias();
+
   return (
     <>
       <h1>Categorias</h1>
-      <ul className="lista">
-        {categorias.map((c) => {
-          const total = contarLancamentosPorCategoria(c.id);
-          return (
+      {categorias.length === 0 ? (
+        <p className="muted">Nenhuma categoria cadastrada ainda.</p>
+      ) : (
+        <ul className="lista">
+          {categorias.map((c) => (
             <li key={c.id} className="card">
               <div>
+                <span
+                  aria-hidden
+                  style={{
+                    display: "inline-block",
+                    width: 12,
+                    height: 12,
+                    marginRight: 8,
+                    borderRadius: "50%",
+                    background: c.corHex,
+                  }}
+                />
                 <Link href={`/categoria/${c.id}`}>
                   <strong>{c.nome}</strong>
                 </Link>
-                <div className="muted">{c.descricao}</div>
+                <div className="muted">{c.tipo === "entrada" ? "Entrada" : "Saída"}</div>
               </div>
-              {total > 0 && (
+              {c.totalLancamentos > 0 && (
                 <span className="muted">
-                  {total} {total === 1 ? "lançamento" : "lançamentos"}
+                  {c.totalLancamentos} {c.totalLancamentos === 1 ? "lançamento" : "lançamentos"}
                 </span>
               )}
             </li>
-          );
-        })}
-      </ul>
+          ))}
+        </ul>
+      )}
     </>
   );
 }

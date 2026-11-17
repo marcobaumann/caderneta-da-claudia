@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Caderneta da Claudia",
+  title: { default: "Caderneta da Cláudia", template: "%s · Caderneta da Cláudia" },
   description: "Controle financeiro pessoal",
 };
 

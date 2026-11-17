@@ -1,3 +1,5 @@
+import { createClient } from "@/lib/supabase/server";
+
 export type TipoLancamento = "entrada" | "saida";
 
 export type Lancamento = {
@@ -6,42 +8,78 @@ export type Lancamento = {
   valor: number;
   tipo: TipoLancamento;
   data: string; // formato AAAA-MM-DD
-  categoriaId?: number; // opcional: lançamento pode não ter categoria
+  categoriaId?: number;
+  categoriaNome?: string;
 };
 
-// Dados de exemplo (ainda sem banco de dados).
-const lancamentos: Lancamento[] = [
-  { id: 1, descricao: "mercado do mes", valor: 341.43, tipo: "saida", data: "2025-01-01", categoriaId: 1 },
-  { id: 2, descricao: "salario", valor: 856.74, tipo: "entrada", data: "2025-01-02", categoriaId: 4 },
-  { id: 3, descricao: "conta de luz", valor: 89.05, tipo: "saida", data: "2025-01-03", categoriaId: 2 },
-  { id: 4, descricao: "padaria", valor: 123.97, tipo: "saida", data: "2025-01-04", categoriaId: 1 },
-  { id: 5, descricao: "aluguel", valor: 2350.0, tipo: "saida", data: "2025-01-05", categoriaId: 2 },
-  { id: 6, descricao: "freela", valor: 1200.0, tipo: "entrada", data: "2025-01-06", categoriaId: 4 },
-];
+// Colunas conforme schema.sql, com o nome da categoria vindo do join pela FK.
+const COLUNAS =
+  "lancamento_id, tipo, valor, data_lancamento, descricao, categoria_id, categorias(nome)";
 
-// Simula uma busca de dados: espera 300ms e devolve os lançamentos.
+type Linha = {
+  lancamento_id: number;
+  tipo: TipoLancamento;
+  valor: number | string; // numeric pode chegar como string
+  data_lancamento: string;
+  descricao: string | null;
+  categoria_id: number | null;
+  categorias: { nome: string } | null;
+};
+
+function paraLancamento(l: Linha): Lancamento {
+  return {
+    id: l.lancamento_id,
+    descricao: l.descricao?.trim() || "(sem descrição)",
+    valor: Number(l.valor),
+    tipo: l.tipo,
+    data: l.data_lancamento,
+    categoriaId: l.categoria_id ?? undefined,
+    categoriaNome: l.categorias?.nome.trim(),
+  };
+}
+
+// Nenhuma função filtra por usuário no código: o RLS (supabase/rls.sql) só devolve
+// as linhas do usuario_id ligado ao login atual.
+
+// Do mais recente para o mais antigo.
 export async function listarLancamentos(): Promise<Lancamento[]> {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return lancamentos;
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("lancamentos")
+    .select(COLUNAS)
+    .order("data_lancamento", { ascending: false })
+    .order("lancamento_id", { ascending: false })
+    .overrideTypes<Linha[], { merge: false }>();
+
+  if (error) throw new Error(`Falha ao buscar lançamentos: ${error.message}`);
+  return data.map(paraLancamento);
 }
 
-export function buscarLancamento(id: number): Lancamento | undefined {
-  return lancamentos.find((l) => l.id === id);
+export async function buscarLancamento(id: number): Promise<Lancamento | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("lancamentos")
+    .select(COLUNAS)
+    .eq("lancamento_id", id)
+    .maybeSingle<Linha>();
+
+  if (error) throw new Error(`Falha ao buscar o lançamento: ${error.message}`);
+  return data ? paraLancamento(data) : null;
 }
 
-export function listarLancamentosPorCategoria(categoriaId: number): Lancamento[] {
-  return lancamentos.filter((l) => l.categoriaId === categoriaId);
-}
+export async function listarLancamentosPorCategoria(categoriaId: number): Promise<Lancamento[]> {
+  const supabase = await createClient();
 
-export function contarLancamentosPorCategoria(categoriaId: number): number {
-  return listarLancamentosPorCategoria(categoriaId).length;
-}
+  const { data, error } = await supabase
+    .from("lancamentos")
+    .select(COLUNAS)
+    .eq("categoria_id", categoriaId)
+    .order("data_lancamento", { ascending: false })
+    .order("lancamento_id", { ascending: false })
+    .overrideTypes<Linha[], { merge: false }>();
 
-export function formatarValor(valor: number): string {
-  return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-export function formatarData(data: string): string {
-  const [ano, mes, dia] = data.split("-");
-  return `${dia}/${mes}/${ano}`;
+  if (error) throw new Error(`Falha ao buscar lançamentos da categoria: ${error.message}`);
+  return data.map(paraLancamento);
 }

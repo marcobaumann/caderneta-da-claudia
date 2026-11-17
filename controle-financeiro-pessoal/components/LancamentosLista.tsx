@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import LancamentoCard from "@/components/LancamentoCard";
+import { formatarValor } from "@/lib/formatadores";
 import type { Lancamento } from "@/lib/lancamentos";
 
 type Filtro = "todos" | "entrada" | "saida";
@@ -19,14 +20,28 @@ const ROTULO: Record<Filtro, string> = {
   saida: "Mostrando: só saídas",
 };
 
+// Minúsculas e sem acentos: "Salário" e "salario" passam a ser equivalentes na busca.
+function normalizar(texto: string): string {
+  return texto
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+}
+
 export default function LancamentosLista({ lancamentos }: { lancamentos: Lancamento[] }) {
   const [busca, setBusca] = useState("");
   const [filtro, setFiltro] = useState<Filtro>("todos");
 
-  const termo = busca.trim().toLowerCase();
+  const termo = normalizar(busca.trim());
   const visiveis = lancamentos.filter(
-    (l) =>
-      (filtro === "todos" || l.tipo === filtro) && l.descricao.toLowerCase().includes(termo),
+    (l) => (filtro === "todos" || l.tipo === filtro) && normalizar(l.descricao).includes(termo),
+  );
+
+  // Saldo dos itens visíveis: entradas somam, saídas subtraem.
+  // Soma em centavos para evitar erros de ponto flutuante.
+  const totalCentavos = visiveis.reduce(
+    (soma, l) => soma + (l.tipo === "entrada" ? 1 : -1) * Math.round(l.valor * 100),
+    0,
   );
 
   return (
@@ -45,7 +60,11 @@ export default function LancamentosLista({ lancamentos }: { lancamentos: Lancame
       </div>
 
       {visiveis.length === 0 ? (
-        <p className="muted">Nenhum lançamento encontrado.</p>
+        <p className="muted">
+          {lancamentos.length === 0
+            ? "Nenhum lançamento cadastrado ainda."
+            : "Nenhum lançamento corresponde ao filtro."}
+        </p>
       ) : (
         <ul className="lista">
           {visiveis.map((l) => (
@@ -56,9 +75,16 @@ export default function LancamentosLista({ lancamentos }: { lancamentos: Lancame
               valor={l.valor}
               tipo={l.tipo}
               data={l.data}
+              categoriaNome={l.categoriaNome}
             />
           ))}
         </ul>
+      )}
+
+      {visiveis.length > 0 && (
+        <p>
+          <strong>Total: {formatarValor(totalCentavos / 100)}</strong>
+        </p>
       )}
     </>
   );
