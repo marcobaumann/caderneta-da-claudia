@@ -1,16 +1,42 @@
+:root {
+  --fundo: #f4f6f8;
+  --superficie: #ffffff;
+  --borda: #e3e7ec;
+  --texto: #1f2937;
+  --suave: #6b7280;
+  --primaria: #2563eb;
+  --primaria-escura: #1d4ed8;
+  --entrada: #15803d;
+  --saida: #b91c1c;
+  --raio: 10px;
+  --sombra: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
-  color: #1f2937;
-  background: #f9fafb;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+  color: var(--texto);
+  background: var(--fundo);
+}
+
+h1 {
+  margin: 8px 0 16px;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  margin: 28px 0 12px;
+  font-size: 1.15rem;
 }
 
 a {
-  color: #2563eb;
+  color: var(--primaria);
   text-decoration: none;
 }
 
@@ -21,40 +47,233 @@ a:hover {
 .container {
   max-width: 720px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 24px 16px 48px;
 }
 
+/* ---------- Menu ---------- */
 .menu {
   display: flex;
-  gap: 16px;
-  padding: 16px;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  padding: 10px 16px;
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borda);
+  box-shadow: var(--sombra);
+}
+
+.menu a {
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: var(--texto);
+  font-weight: 500;
+}
+
+.menu a:hover {
+  background: var(--fundo);
+  text-decoration: none;
 }
 
 .menu-sair {
   margin-left: auto;
 }
 
+/* ---------- Listas e cards ---------- */
 .lista {
   list-style: none;
-  margin: 0;
+  margin: 16px 0;
   padding: 0;
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.card:hover {
+  border-color: #c9d3df;
+}
+
+.card strong {
+  color: var(--texto);
 }
 
 .muted {
-  color: #6b7280;
+  color: var(--suave);
   font-size: 0.875rem;
+}
+
+.valor {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.valor.entrada {
+  color: var(--entrada);
+}
+
+.valor.saida {
+  color: var(--saida);
+}
+
+.total {
+  margin: 16px 0;
+  padding: 12px 16px;
+  text-align: right;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+/* ---------- Filtros ---------- */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filtros input {
+  flex: 1 1 200px;
+}
+
+/* ---------- Formulários ---------- */
+form p {
+  margin: 0 0 16px;
+}
+
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+label br {
+  display: none;
+}
+
+input,
+select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px 12px;
+  font: inherit;
+  font-weight: 400;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 1px solid #cfd6de;
+  border-radius: 8px;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 0;
+  border-color: var(--primaria);
+}
+
+/* ---------- Botões ---------- */
+button,
+.botao {
+  display: inline-block;
+  padding: 9px 16px;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primaria);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+button:hover,
+.botao:hover {
+  background: var(--primaria-escura);
+  text-decoration: none;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button.secundario,
+.menu-sair button {
+  color: var(--texto);
+  background: var(--superficie);
+  border-color: #cfd6de;
+}
+
+button.secundario:hover,
+.menu-sair button:hover {
+  background: var(--fundo);
+}
+
+button.perigo {
+  background: var(--saida);
+}
+
+button.perigo:hover {
+  background: #991b1b;
+}
+
+/* ---------- Mensagens ---------- */
+.erro {
+  padding: 10px 12px;
+  color: var(--saida);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+}
+
+[role="status"] {
+  padding: 10px 12px;
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+}
+
+@media (max-width: 480px) {
+  .card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ---------- Aviso (toast) ---------- */
+.aviso {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.15);
+  font-weight: 600;
+}
+
+.aviso-fechar {
+  padding: 0 6px;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: inherit;
+  background: transparent;
+}
+
+.aviso-fechar:hover {
+  background: rgba(22, 101, 52, 0.12);
 }

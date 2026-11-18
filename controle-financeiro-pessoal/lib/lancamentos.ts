@@ -8,13 +8,14 @@ export type Lancamento = {
   valor: number;
   tipo: TipoLancamento;
   data: string; // formato AAAA-MM-DD
+  contaId: number;
   categoriaId?: number;
   categoriaNome?: string;
 };
 
 // Colunas conforme schema.sql, com o nome da categoria vindo do join pela FK.
 const COLUNAS =
-  "lancamento_id, tipo, valor, data_lancamento, descricao, categoria_id, categorias(nome)";
+  "lancamento_id, tipo, valor, data_lancamento, descricao, conta_id, categoria_id, categorias(nome)";
 
 type Linha = {
   lancamento_id: number;
@@ -22,6 +23,7 @@ type Linha = {
   valor: number | string; // numeric pode chegar como string
   data_lancamento: string;
   descricao: string | null;
+  conta_id: number;
   categoria_id: number | null;
   categorias: { nome: string } | null;
 };
@@ -33,6 +35,7 @@ function paraLancamento(l: Linha): Lancamento {
     valor: Number(l.valor),
     tipo: l.tipo,
     data: l.data_lancamento,
+    contaId: l.conta_id,
     categoriaId: l.categoria_id ?? undefined,
     categoriaNome: l.categorias?.nome.trim(),
   };

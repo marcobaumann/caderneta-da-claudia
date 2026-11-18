@@ -46,15 +46,15 @@ export default function LancamentosLista({ lancamentos }: { lancamentos: Lancame
 
   return (
     <>
-      <div>
+      <div className="filtros">
         <input
           type="search"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Filtrar por descrição"
           aria-label="Filtrar por descrição"
-        />{" "}
-        <button type="button" onClick={() => setFiltro(PROXIMO[filtro])}>
+        />
+        <button type="button" className="secundario" onClick={() => setFiltro(PROXIMO[filtro])}>
           {ROTULO[filtro]}
         </button>
       </div>
@@ -82,7 +82,7 @@ export default function LancamentosLista({ lancamentos }: { lancamentos: Lancame
       )}
 
       {visiveis.length > 0 && (
-        <p>
+        <p className="total">
           <strong>Total: {formatarValor(totalCentavos / 100)}</strong>
         </p>
       )}

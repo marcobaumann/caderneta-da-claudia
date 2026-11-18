@@ -41,7 +41,7 @@ export default function LoginForm({ next }: { next?: string }) {
       </p>
 
       {estado.erro && (
-        <p role="alert" style={{ color: "#b91c1c" }}>
+        <p role="alert" className="erro">
           {estado.erro}
         </p>
       )}
@@ -51,7 +51,7 @@ export default function LoginForm({ next }: { next?: string }) {
       <button type="submit" name="modo" value="entrar" disabled={pendente}>
         {pendente ? "Aguarde..." : "Entrar"}
       </button>{" "}
-      <button type="submit" name="modo" value="cadastrar" disabled={pendente}>
+      <button type="submit" name="modo" value="cadastrar" className="secundario" disabled={pendente}>
         Criar conta
       </button>
     </form>

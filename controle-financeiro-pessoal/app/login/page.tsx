@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: Props) {
       <h1>Caderneta da Cláudia</h1>
 
       {erro === "confirmacao" && (
-        <p role="alert" style={{ color: "#b91c1c" }}>
+        <p role="alert" className="erro">
           Não foi possível confirmar o e-mail. O link pode ter expirado: crie a conta de novo ou
           tente entrar.
         </p>

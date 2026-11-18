@@ -20,7 +20,6 @@ export default function LancamentoCard({
   categoriaNome,
 }: LancamentoCardProps) {
   const sinal = tipo === "entrada" ? "+" : "-";
-  const cor = tipo === "entrada" ? "#15803d" : "#b91c1c";
 
   return (
     <li className="card">
@@ -33,7 +32,7 @@ export default function LancamentoCard({
           {categoriaNome && ` · ${categoriaNome}`}
         </div>
       </div>
-      <span style={{ color: cor, fontWeight: 700 }}>
+      <span className={`valor ${tipo}`}>
         {sinal} {formatarValor(valor)}
       </span>
     </li>

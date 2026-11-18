@@ -21,6 +21,9 @@ export default async function LancamentoPage({ params }: { params: Promise<{ id:
         <Link href="/lancamentos">← Voltar</Link>
       </p>
       <h1>{lancamento.descricao}</h1>
+      <p>
+        <Link href={`/lancamentos/${lancamento.id}/editar`}>Editar</Link>
+      </p>
       <p>Tipo: {lancamento.tipo === "entrada" ? "Entrada" : "Saída"}</p>
       <p>Valor: {formatarValor(lancamento.valor)}</p>
       <p>Data: {formatarData(lancamento.data)}</p>
