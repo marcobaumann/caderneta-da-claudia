@@ -26,6 +26,9 @@ export default async function CategoriaPage({ params }: { params: Promise<{ id: 
         <Link href="/categorias">← Voltar</Link>
       </p>
       <h1>{categoria.nome}</h1>
+      <p>
+        <Link href={`/categoria/${categoria.id}/editar`}>Editar</Link>
+      </p>
       <p className="muted">{categoria.tipo === "entrada" ? "Entrada" : "Saída"}</p>
 
       <h2>Lançamentos</h2>

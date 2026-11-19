@@ -1,8 +1,15 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { obterUsuarioId } from "@/lib/auth";
+import {
+  ERRO_GENERICO,
+  ERRO_SESSAO,
+  POSTGRES_FK_VIOLADA,
+  atualizarTudo,
+  texto,
+  type EstadoAcao,
+} from "@/lib/formularios";
 import { lerId } from "@/lib/ids";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,7 +23,7 @@ export type ValoresLancamento = {
   categoriaId: string;
 };
 
-export type EstadoLancamento = { erro?: string; valores?: ValoresLancamento };
+export type EstadoLancamento = EstadoAcao & { valores?: ValoresLancamento };
 
 type DadosValidos = {
   descricao: string;
@@ -26,15 +33,6 @@ type DadosValidos = {
   contaId: number;
   categoriaId: number;
 };
-
-const ERRO_GENERICO = "Não foi possível salvar agora. Tente novamente.";
-const ERRO_SESSAO = "Não foi possível identificar o seu usuário. Entre novamente.";
-const POSTGRES_FK_VIOLADA = "23503";
-
-function texto(formData: FormData, campo: string): string {
-  const valor = formData.get(campo);
-  return typeof valor === "string" ? valor : "";
-}
 
 // Aceita "12.5", "12,50" e "1.234,56". Devolve null se não for um valor positivo
 // com até 2 casas que caiba em NUMERIC(10,2).
@@ -86,11 +84,6 @@ function mensagemDoErro(error: { code?: string }): string {
   return error.code === POSTGRES_FK_VIOLADA ? "Conta ou categoria inválida." : ERRO_GENERICO;
 }
 
-function atualizarTelas() {
-  revalidatePath("/lancamentos");
-  revalidatePath("/categorias");
-}
-
 export async function criarLancamento(
   _anterior: EstadoLancamento,
   formData: FormData,
@@ -120,7 +113,7 @@ export async function criarLancamento(
   }
 
   // redirect() lança uma exceção interna do Next: fica fora do try/catch.
-  atualizarTelas();
+  atualizarTudo();
   redirect("/lancamentos?aviso=criado");
 }
 
@@ -160,8 +153,7 @@ export async function editarLancamento(
     return { erro: ERRO_GENERICO, valores };
   }
 
-  atualizarTelas();
-  revalidatePath(`/lancamentos/${id}`);
+  atualizarTudo();
   redirect("/lancamentos?aviso=editado");
 }
 
@@ -187,7 +179,7 @@ export async function excluirLancamento(
     return { erro: "Não foi possível excluir agora. Tente novamente." };
   }
 
-  atualizarTelas();
+  atualizarTudo();
   redirect("/lancamentos?aviso=excluido");
 }
 

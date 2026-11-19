@@ -1,15 +1,35 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Aviso from "@/components/Aviso";
 import { listarCategorias } from "@/lib/categorias";
 
 export const metadata: Metadata = { title: "Categorias" };
 
-export default async function CategoriasPage() {
+const AVISOS: Record<string, string> = {
+  criada: "Categoria cadastrada com sucesso!",
+  editada: "Categoria atualizada com sucesso!",
+  excluida: "Categoria excluída com sucesso!",
+};
+
+export default async function CategoriasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ aviso?: string }>;
+}) {
+  const { aviso } = await searchParams;
+  // Só mensagens conhecidas: um ?aviso=qualquer-coisa na URL não mostra nada.
+  const mensagem = aviso !== undefined && Object.hasOwn(AVISOS, aviso) ? AVISOS[aviso] : undefined;
   const categorias = await listarCategorias();
 
   return (
     <>
+      {mensagem && <Aviso mensagem={mensagem} />}
       <h1>Categorias</h1>
+      <p>
+        <Link href="/categorias/nova" className="botao">
+          + Nova categoria
+        </Link>
+      </p>
       {categorias.length === 0 ? (
         <p className="muted">Nenhuma categoria cadastrada ainda.</p>
       ) : (

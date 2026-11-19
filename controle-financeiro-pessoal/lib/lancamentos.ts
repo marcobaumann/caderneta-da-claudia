@@ -86,3 +86,37 @@ export async function listarLancamentosPorCategoria(categoriaId: number): Promis
   if (error) throw new Error(`Falha ao buscar lançamentos da categoria: ${error.message}`);
   return data.map(paraLancamento);
 }
+
+// O Supabase devolve no máximo 1000 linhas por consulta; busca em páginas para não truncar sem avisar.
+const TAMANHO_PAGINA = 1000;
+
+// Só os lançamentos entre `inicio` e `fim` (AAAA-MM-DD, ambos inclusos), opcionalmente de um tipo.
+// O filtro por data roda no banco; o RLS limita ao usuário logado.
+export async function listarLancamentosPorPeriodo(
+  inicio: string,
+  fim: string,
+  tipo?: TipoLancamento,
+): Promise<Lancamento[]> {
+  const supabase = await createClient();
+  const lancamentos: Lancamento[] = [];
+
+  for (let de = 0; ; de += TAMANHO_PAGINA) {
+    let consulta = supabase
+      .from("lancamentos")
+      .select(COLUNAS)
+      .gte("data_lancamento", inicio)
+      .lte("data_lancamento", fim);
+    if (tipo) consulta = consulta.eq("tipo", tipo);
+
+    // A ordem precisa ser estável (desempate pelo id) para as páginas não se repetirem.
+    const { data, error } = await consulta
+      .order("data_lancamento", { ascending: false })
+      .order("lancamento_id", { ascending: false })
+      .range(de, de + TAMANHO_PAGINA - 1)
+      .overrideTypes<Linha[], { merge: false }>();
+
+    if (error) throw new Error(`Falha ao buscar lançamentos do período: ${error.message}`);
+    lancamentos.push(...data.map(paraLancamento));
+    if (data.length < TAMANHO_PAGINA) return lancamentos;
+  }
+}

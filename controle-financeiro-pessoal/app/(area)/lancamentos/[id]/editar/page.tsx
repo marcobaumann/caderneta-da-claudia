@@ -48,7 +48,7 @@ export default async function EditarLancamentoPage({ params }: { params: Promise
       />
 
       <h2>Excluir</h2>
-      <BotaoExcluir acao={excluirLancamento.bind(null, id)} />
+      <BotaoExcluir acao={excluirLancamento.bind(null, id)} confirmacao="Excluir este lançamento?" />
     </>
   );
 }
